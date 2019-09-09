@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+  jcenter()
+  maven {
+    url 'http://packages.confluent.io/maven/'
+  }
+  maven {
+    url 'http://maven.snplow.com/releases/'
+  }
+}
+
+dependencies {
+  compile 'org.apache.kafka:kafka-clients:2.1.1'
+  compile 'org.apache.thrift:libthrift:0.9.1'
+  compile 'com.snowplowanalytics:collector-payload-1:0.0.0'
+  compile 'io.confluent:kafka-streams-avro-serde:5.1.2'
+  compile 'org.apache.kafka:kafka-streams:2.0.1'
+  compile 'org.slf4j:slf4j-log4j12:1.7.25'
+
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.apache.kafka:kafka-streams-test-utils:2.1.1'
+}
+
+mainClassName = 'thrift2avro.Translator'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+task fatJar(type: Jar) {
+  manifest {
+    attributes 'Main-Class': 'thrift2avro.Translator'
+  }
+  baseName = project.name + '-all'
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  with jar
+}
